@@ -5,15 +5,14 @@
  Description: This plugin allows provisioning of blogs on a Wordpress multi-site installation from external packages and billing systems such as WHMCS.
 
  Author: EBO
- Version: 0.9.0
+ Version: 0.9.1
  Author URI: http://www.choppedcode.com/
  */
 
 //error_reporting(E_ALL & ~E_NOTICE);
 //ini_set('display_errors', '1');
 
-define("CC_RP_VERSION","0.9.0");
-define("CC_RP_VERSION","4.0");
+define("CC_RP_VERSION","0.9.1");
 
 // Pre-2.6 compatibility for wp-content folder location
 if (!defined("WP_CONTENT_URL")) {
@@ -148,7 +147,7 @@ function cc_rp_admin() {
 		}
 
 		remove_user_from_blog( $user_id, '1' ); //removes new user from blog_id 1
-		
+
 		$wpdb->hide_errors();
 		$blog_id = wpmu_create_blog( $newdomain, $path, $title, $user_id , array( 'public' => 1 ), $current_site->id );
 
@@ -162,14 +161,14 @@ function cc_rp_admin() {
 			$roleSlug=preg_replace("/[^a-zA-Z0-9\s]/", "", $roleSlug);
 			$roles=new WP_Roles();
 			$roles->add_role($roleSlug,$roleName,array($roleSlug));
-				
+
 			remove_user_from_blog($user_id, $blog_id);
 			add_user_to_blog($blog_id, $user_id, 'subscriber');
 			$user=new WP_User($user_id);
 			$user->add_role($roleSlug);
 		}
-		
-		
+
+
 		$wpdb->show_errors();
 		if ( !is_wp_error( $blog_id ) ) {
 			if ( !is_super_admin( $user_id ) && !get_user_option( 'primary_blog', $user_id ) )
@@ -187,25 +186,46 @@ function cc_rp_admin() {
 		return;
 
 	} elseif ($action=='suspend') {
+		$domain=$_POST['blog']['domain'];
+		echo 'suspend '.$domain;
+		$id=get_id_from_blogname($domain);
 		update_blog_status( $id, 'archived', '1' );
 		return;
-		
+
 	} elseif ($action=='unsuspend') {
+		$domain=$_POST['blog']['domain'];
+		echo 'unsuspend '.$domain;
+		$id=get_id_from_blogname($domain);
 		update_blog_status( $id, 'archived', '0' );
 		return;
-		
+
+	} elseif ($action=='terminate') {
+		$domain=$_POST['blog']['domain'];
+		echo 'terminate '.$domain;
+		$id=get_id_from_blogname($domain);
+		update_blog_status( $id, 'deleted', '1' );
+		//wpmu_delete_blog($id,true); 
+		return;
 	}
 	?>
 <div class="wrap">
 <h2><b>Remote provisioning</b></h2>
-<p>The Remote Provisioning plugin allows provisioning of blogs on a Wordpress multi-site installation from external packages and billing systems such as <a href="http://www.whmcs.com" target="_blank">WHMCS</a>.<br />
-Basically this means you can charge for providing Wordpress blogs using your prefered billing system. It supports creation, (un)suspension and cancellation of Wordpress blogs.<br /> 
+<p>The Remote Provisioning plugin allows provisioning of blogs on a Wordpress multi-site
+installation from external packages and billing systems such as <a href="http://www.whmcs.com"
+	target="_blank"
+>WHMCS</a>.<br />
+Basically this means you can charge for providing Wordpress blogs using your prefered billing
+system. It supports creation, (un)suspension and cancellation of Wordpress blogs.<br />
 You need to download the matching module for your external package.<br />
-We have one available for WHMCS at the moment. Just drop us an email at support@choppedcode.com.<br /><br />
+We have one available for WHMCS at the moment. Just follow this <a
+	href="http://www.clientcentral.info/cart.php?a=add&pid=22"
+>link</a>.<br />
+<br />
 That's it, no other settings.
 <hr />
-<a href="http://www.choppedcode.com" target="_blank" alt="Chopped Code" title="Chopped Code"><image src="<?php echo CC_RP_URL;?>choppedcode.png" /></a>
-</p>
+<a href="http://www.choppedcode.com" target="_blank" alt="Chopped Code" title="Chopped Code"><image
+	src="<?php echo CC_RP_URL;?>choppedcode.png"
+/></a></p>
 
 	<?php
 	$cc_ew=cc_rp_check();
@@ -224,6 +244,6 @@ That's it, no other settings.
 		echo '</p></div>';
 	}
 
-echo '</div>'; //end wrap
+	echo '</div>'; //end wrap
 }
-add_action('admin_menu', 'cc_rp_add_admin'); 
+add_action('admin_menu', 'cc_rp_add_admin');

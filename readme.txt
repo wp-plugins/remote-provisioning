@@ -4,7 +4,7 @@ Donate link: http://www.choppedcode.com/
 Tags: WHMCS, hosting, support, billing, integration, provisioning
 Requires at least: 2.1.7
 Tested up to: 3.1
-Stable tag: 0.9.0
+Stable tag: 0.9.1
 
 This plugin allows provisioning of blogs on a Wordpress multi-site installation from external packages and billing systems such as WHMCS.
 
@@ -29,6 +29,9 @@ Please visit the [ChoppedCode](http://forums.choppedcode.com/forumdisplay.php?fi
 Simply go to the Wordpress Settings page for the plugins and click the Upgrade button.
 
 == Changelog ==
+
+= 0.9.1 =
+* Added suspend/unsuspend option
 
 = 0.9.0 =
 * Alpha release
