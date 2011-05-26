@@ -18,7 +18,7 @@ This plugin allows provisioning of blogs on a Wordpress multi-site installation 
 2. Activate the plugin through the 'Plugins' menu in WordPress.
 3. Order a [license](http://www.clientcentral.info/cart.php?a=add&pid=22 "license").
 4. Enter the license key in the Wordpress plugin options panel.
-5. Download and install the WHMCS Wordpress provisioning module.
+5. Download and install the WHMCS Wordpress provisioning module from the [portal](http://www.clientcentral.info "portal").
 
 Please visit the [ChoppedCode](http://forums.choppedcode.com "ChoppedCode Support Forum") for more information and support.
 
@@ -33,7 +33,7 @@ Simply go to the Wordpress Settings page for the plugins and click the Upgrade b
 == Changelog ==
 
 = 0.9.2 =
-* Beta release
+* Updated installation instructions
 
 = 0.9.1 =
 * Added suspend/unsuspend option
