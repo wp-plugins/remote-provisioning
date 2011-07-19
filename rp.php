@@ -5,14 +5,14 @@
  Description: This plugin allows provisioning of blogs on a Wordpress multi-site installation from external packages and billing systems such as WHMCS.
 
  Author: EBO
- Version: 0.9.2
+ Version: 1.0.0
  Author URI: http://www.choppedcode.com/
  */
 
 //error_reporting(E_ALL & ~E_NOTICE);
 //ini_set('display_errors', '1');
 
-define("CC_RP_VERSION","0.9.2");
+define("CC_RP_VERSION","1.0.0");
 
 // Pre-2.6 compatibility for wp-content folder location
 if (!defined("WP_CONTENT_URL")) {
@@ -31,6 +31,7 @@ if (!defined("CC_RP_PLUGIN")) {
 define("CC_RP_URL", WP_CONTENT_URL . "/plugins/".CC_RP_PLUGIN."/");
 
 add_action('admin_notices','cc_rp_check');
+add_action("init","cc_rp_init");
 
 register_activation_hook(__FILE__,'cc_rp_activate');
 register_deactivation_hook(__FILE__,'cc_rp_deactivate');
@@ -90,39 +91,46 @@ function cc_rp_deactivate() {
 function cc_rp_init()
 {
 	ob_start();
-	session_start();
+	//session_start();
 }
 
 function cc_rp_add_admin() {
 	add_options_page('Remote provisioning', 'Remote provisioning', 'administrator', 'cc-rp-cp','cc_rp_admin');
 }
 
-function cc_rp_admin() {
-
+function cc_rp_action($action) {
 	global $wpdb,$current_user,$current_site,$base;
-
-	$action=$_POST['action'];
+	
+	$ret=array('action' => $action);
+	
 	if ($action=='create') {
 		$blog = $_POST['blog'];
 		$domain = '';
-		if ( ! preg_match( '/(--)/', $blog['domain'] ) && preg_match( '|^([a-zA-Z0-9-])+$|', $blog['domain'] ) )
-		$domain = strtolower( $blog['domain'] );
+		if ( ! preg_match( '/(--)/', $blog['domain'] ) && preg_match( '|^([a-zA-Z0-9-])+$|', $blog['domain'] ) ) $domain = strtolower( $blog['domain'] );
 
 		// If not a subdomain install, make sure the domain isn't a reserved word
 		if ( ! is_subdomain_install() ) {
 			$subdirectory_reserved_names = apply_filters( 'subdirectory_reserved_names', array( 'page', 'comments', 'blog', 'files', 'feed' ) );
-			if ( in_array( $domain, $subdirectory_reserved_names ) )
-			wp_die( sprintf( __('The following words are reserved for use by WordPress functions and cannot be used as blog names: <code>%s</code>' ), implode( '</code>, <code>', $subdirectory_reserved_names ) ) );
+			if ( in_array( $domain, $subdirectory_reserved_names ) ) {
+				$ret['error']=sprintf(__('The following words are reserved for use by WordPress functions and cannot be used as blog names: <code>%s</code>'), implode( '</code>, <code>', $subdirectory_reserved_names ));
+				return $ret;
+			}
 		}
 		$email = sanitize_email( $blog['email'] );
 		$title = $blog['title'];
 
-		if ( empty( $domain ) )
-		wp_die( __( 'Missing or invalid site address.' ) );
-		if ( empty( $email ) )
-		wp_die( __( 'Missing email address.' ) );
-		if ( !is_email( $email ) )
-		wp_die( __( 'Invalid email address.' ) );
+		if ( empty( $domain ) ) {
+			$ret['error']=__('Missing or invalid site address.');
+			return $ret;
+		}
+		if ( empty( $email ) ) {
+			$ret['error']=__('Missing email address.');
+			return $ret;
+		}
+		if ( !is_email( $email ) ) {
+			$ret['error']=__('Invalid email address.');
+			return $ret;
+		}
 
 		$userName=$_POST['blog']['username'];
 		$userName=$email;
@@ -138,10 +146,10 @@ function cc_rp_admin() {
 		if ( !$user_id ) { // Create a new user with a random password
 			$password=$blog['password'];
 			$user_id = wpmu_create_user( $userName, $blog['password'], $email );
-			if ( false == $user_id )
-			wp_die( __( 'There was an error creating the user.' ) );
-			else
-			wp_new_user_notification( $user_id, $password );
+			if ( false == $user_id ) {
+				$ret['error']=__( 'There was an error creating the user.' );
+				return $ret;
+			} else wp_new_user_notification( $user_id, $password );
 		} else {
 			$password='[your current password]';
 		}
@@ -151,9 +159,6 @@ function cc_rp_admin() {
 		$wpdb->hide_errors();
 		$blog_id = wpmu_create_blog( $newdomain, $path, $title, $user_id , array( 'public' => 1 ), $current_site->id );
 
-
-		//global $current_user;
-		//get_currentuserinfo();
 		if ($blog['defaultrole']) {
 			$roleName=$blog['defaultrole'];
 			$roleSlug=str_replace(' ','_',$roleName);
@@ -168,36 +173,32 @@ function cc_rp_admin() {
 			$user->add_role($roleSlug);
 		}
 
-
 		$wpdb->show_errors();
 		if ( !is_wp_error( $blog_id ) ) {
-			if ( !is_super_admin( $user_id ) && !get_user_option( 'primary_blog', $user_id ) )
-			update_user_option( $user_id, 'primary_blog', $blog_id, true );
+			if ( !is_super_admin( $user_id ) && !get_user_option( 'primary_blog', $user_id ) ) update_user_option( $user_id, 'primary_blog', $blog_id, true );
 			//$content_mail = sprintf( __( "New site created by %1s\n\nAddress: http://%2s\nName: %3s"), $current_user->user_login , $newdomain . $path, stripslashes( $title ) );
 			//wp_mail( get_site_option('admin_email'), sprintf( __( '[%s] New Site Created' ), $current_site->site_name ), $content_mail, 'From: "Site Admin" <' . get_site_option( 'admin_email' ) . '>' );
 			//wpmu_welcome_notification( $blog_id, $user_id, $password, $title, array( 'public' => 1 ) );
 			//wp_redirect( add_query_arg( array('update' => 'added'), 'site-new.php' ) );
 			//exit;
 		} else {
-			//wp_die( $blog_id->get_error_message() );
+			$ret['error']=$blog_id->get_error_message();
+			return $ret;
 		}
 		mkdir(WP_CONTENT_DIR.'/blogs.dir/'.$blog_id);
 		mkdir(WP_CONTENT_DIR.'/blogs.dir/'.$blog_id.'/files');
-		return;
 
 	} elseif ($action=='suspend') {
 		$domain=$_POST['blog']['domain'];
 		echo 'suspend '.$domain;
 		$id=get_id_from_blogname($domain);
 		update_blog_status( $id, 'archived', '1' );
-		return;
 
 	} elseif ($action=='unsuspend') {
 		$domain=$_POST['blog']['domain'];
 		echo 'unsuspend '.$domain;
 		$id=get_id_from_blogname($domain);
 		update_blog_status( $id, 'archived', '0' );
-		return;
 
 	} elseif ($action=='terminate') {
 		$domain=$_POST['blog']['domain'];
@@ -205,8 +206,23 @@ function cc_rp_admin() {
 		$id=get_id_from_blogname($domain);
 		update_blog_status( $id, 'deleted', '1' );
 		//wpmu_delete_blog($id,true); 
-		return;
 	}
+	$ret['success']=1;
+	return $ret;
+}
+
+function cc_rp_admin() {
+
+	global $wpdb,$current_user,$current_site,$base;
+
+	$action=$_POST['action'];
+	if ($action) {
+		ob_end_clean();
+		$ret=cc_rp_action($action);
+		echo json_encode($ret);
+		exit;
+	}
+
 	?>
 <div class="wrap">
 <h2><b>Remote provisioning</b></h2>
@@ -217,10 +233,11 @@ installation from external packages and billing systems such as <a href="http://
 Basically this means you can charge for providing Wordpress blogs using your prefered billing
 system. It supports creation, (un)suspension and cancellation of Wordpress blogs.<br />
 You need to download the matching module for your external package.<br />
-We have one available for WHMCS at the moment. Just follow this <a
+We have one available for WHMCS at the moment. Just order via this <a
 	href="http://www.clientcentral.info/cart.php?a=add&pid=22"
 >link</a>.<br />
-<br />
+Set up instructions can be found <a href="http://choppedcode.com/products/remote-provisioning">here</a>. 
+<br /><br />
 That's it, no other settings.
 <hr />
 <a href="http://www.choppedcode.com" target="_blank" alt="Chopped Code" title="Chopped Code"><image

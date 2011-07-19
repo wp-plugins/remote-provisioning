@@ -4,7 +4,7 @@ Donate link: http://www.choppedcode.com/
 Tags: WHMCS, hosting, support, billing, integration, provisioning
 Requires at least: 2.1.7
 Tested up to: 3.1
-Stable tag: 0.9.2
+Stable tag: 1.0.0
 
 This plugin allows provisioning of blogs on a Wordpress multi-site installation from external packages and billing systems such as WHMCS.
 
@@ -20,7 +20,7 @@ This plugin allows provisioning of blogs on a Wordpress multi-site installation 
 4. Enter the license key in the Wordpress plugin options panel.
 5. Download and install the WHMCS Wordpress provisioning module from the [portal](http://www.clientcentral.info "portal").
 
-Please visit the [ChoppedCode](http://forums.choppedcode.com "ChoppedCode Support Forum") for more information and support.
+Please visit our [ChoppedCode](http://www.choppedcode.com/products/remote-provisioning/ "setup instructions") for more information and support.
 
 == Frequently Asked Questions ==
 
@@ -31,6 +31,12 @@ Please visit the [ChoppedCode](http://forums.choppedcode.com/forumdisplay.php?fi
 Simply go to the Wordpress Settings page for the plugins and click the Upgrade button.
 
 == Changelog ==
+
+= 1.0.0 =
+* Added option to set default title in WHMCS addon set up
+* Added option to let the user choose the blog title
+* Added option to let the user choose the blog (sub)directory name
+* Fixed 'go to control panel' button link on user WHMCS account
 
 = 0.9.2 =
 * Updated installation instructions
