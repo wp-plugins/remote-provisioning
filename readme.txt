@@ -1,10 +1,10 @@
-=== Remote Provisioning ===
+=== WHMCS Multi-Site Provisioning ===
 Contributors: EBO
-Donate link: http://www.choppedcode.com/
+Donate link: http://www.zingiri.net/
 Tags: WHMCS, hosting, support, billing, integration, provisioning
 Requires at least: 2.1.7
-Tested up to: 3.1
-Stable tag: 1.0.0
+Tested up to: 3.2.1
+Stable tag: 1.0.1
 
 This plugin allows provisioning of blogs on a Wordpress multi-site installation from external packages and billing systems such as WHMCS.
 
@@ -20,18 +20,27 @@ This plugin allows provisioning of blogs on a Wordpress multi-site installation 
 4. Enter the license key in the Wordpress plugin options panel.
 5. Download and install the WHMCS Wordpress provisioning module from the [portal](http://www.clientcentral.info "portal").
 
-Please visit our [ChoppedCode](http://www.choppedcode.com/products/remote-provisioning/ "setup instructions") for more information and support.
+Please visit our [Zingiri](http://www.zingiri.net/products/remote-provisioning/ "setup instructions") for more information and support.
 
 == Frequently Asked Questions ==
 
-Please visit the [ChoppedCode](http://forums.choppedcode.com/forumdisplay.php?fid=56 "ChoppedCode Support Forum") for more information and support.
+Please visit the [Zingiri](http://forums.zingiri.net/forumdisplay.php?fid=56 "Zingiri Support Forum") for more information and support.
 
 == Upgrade Notice ==
 
 Simply go to the Wordpress Settings page for the plugins and click the Upgrade button.
 
+== To do ==
+* Add support for sub domains
+
 == Changelog ==
 
+= 1.0.1 =
+* Moved text for client area control panel button to language file
+* Language file is no longer encoded and can be customised
+* Copy WHMCS username to WP username when creating
+* Rebranding
+ 
 = 1.0.0 =
 * Added option to set default title in WHMCS addon set up
 * Added option to let the user choose the blog title

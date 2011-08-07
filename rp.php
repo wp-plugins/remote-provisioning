@@ -1,18 +1,18 @@
 <?php
 /*
- Plugin Name: Remote Provisioning
- Plugin URI: http://www.choppedcode.com/Forum
+ Plugin Name: WHMCS Multi-Site Provisioning
+ Plugin URI: http://www.zingiri.net
  Description: This plugin allows provisioning of blogs on a Wordpress multi-site installation from external packages and billing systems such as WHMCS.
 
- Author: EBO
- Version: 1.0.0
- Author URI: http://www.choppedcode.com/
+ Author: Zingiri
+ Version: 1.0.1
+ Author URI: http://www.zingiri.net/
  */
 
 //error_reporting(E_ALL & ~E_NOTICE);
 //ini_set('display_errors', '1');
 
-define("CC_RP_VERSION","1.0.0");
+define("CC_RP_VERSION","1.0.1");
 
 // Pre-2.6 compatibility for wp-content folder location
 if (!defined("WP_CONTENT_URL")) {
@@ -133,7 +133,7 @@ function cc_rp_action($action) {
 		}
 
 		$userName=$_POST['blog']['username'];
-		$userName=$email;
+		if (!$userName) $userName=$email;
 		if ( is_subdomain_install() ) {
 			$newdomain = $domain . '.' . preg_replace( '|^www\.|', '', $current_site->domain );
 			$path = $base;
@@ -236,12 +236,12 @@ You need to download the matching module for your external package.<br />
 We have one available for WHMCS at the moment. Just order via this <a
 	href="http://www.clientcentral.info/cart.php?a=add&pid=22"
 >link</a>.<br />
-Set up instructions can be found <a href="http://choppedcode.com/products/remote-provisioning">here</a>. 
+Set up instructions can be found <a href="http://zingiri.net/products/remote-provisioning">here</a>. 
 <br /><br />
 That's it, no other settings.
 <hr />
-<a href="http://www.choppedcode.com" target="_blank" alt="Chopped Code" title="Chopped Code"><image
-	src="<?php echo CC_RP_URL;?>choppedcode.png"
+<a href="http://www.zingiri.net" target="_blank" alt="Zingiri" title="Zingiri"><image
+	src="http://zingiri.net/logo.png"
 /></a></p>
 
 	<?php
