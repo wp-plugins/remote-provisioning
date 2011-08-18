@@ -4,7 +4,7 @@ Donate link: http://www.zingiri.net/
 Tags: WHMCS, hosting, support, billing, integration, provisioning
 Requires at least: 2.1.7
 Tested up to: 3.2.1
-Stable tag: 1.0.1
+Stable tag: 1.0.2
 
 This plugin allows provisioning of blogs on a Wordpress multi-site installation from external packages and billing systems such as WHMCS.
 
@@ -34,6 +34,9 @@ Simply go to the Wordpress Settings page for the plugins and click the Upgrade b
 * Add support for sub domains
 
 == Changelog ==
+
+= 1.0.2 =
+* Added option to use WHMCS client email as WP user name
 
 = 1.0.1 =
 * Moved text for client area control panel button to language file

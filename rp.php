@@ -5,14 +5,14 @@
  Description: This plugin allows provisioning of blogs on a Wordpress multi-site installation from external packages and billing systems such as WHMCS.
 
  Author: Zingiri
- Version: 1.0.1
+ Version: 1.0.2
  Author URI: http://www.zingiri.net/
  */
 
 //error_reporting(E_ALL & ~E_NOTICE);
 //ini_set('display_errors', '1');
 
-define("CC_RP_VERSION","1.0.1");
+define("CC_RP_VERSION","1.0.2");
 
 // Pre-2.6 compatibility for wp-content folder location
 if (!defined("WP_CONTENT_URL")) {
@@ -149,7 +149,12 @@ function cc_rp_action($action) {
 			if ( false == $user_id ) {
 				$ret['error']=__( 'There was an error creating the user.' );
 				return $ret;
-			} else wp_new_user_notification( $user_id, $password );
+			} else {
+				if ($_POST['blog']['last_name']) update_user_option( $user_id, 'last_name', $_POST['blog']['lastname'], true );
+				if ($_POST['blog']['first_name']) update_user_option( $user_id, 'first_name', $_POST['blog']['firstname'], true );
+				if ($_POST['blog']['nickname']) update_user_option( $user_id, 'nickname', $_POST['blog']['nickname'], true );
+				wp_new_user_notification( $user_id, $password );
+			}
 		} else {
 			$password='[your current password]';
 		}
@@ -176,11 +181,6 @@ function cc_rp_action($action) {
 		$wpdb->show_errors();
 		if ( !is_wp_error( $blog_id ) ) {
 			if ( !is_super_admin( $user_id ) && !get_user_option( 'primary_blog', $user_id ) ) update_user_option( $user_id, 'primary_blog', $blog_id, true );
-			//$content_mail = sprintf( __( "New site created by %1s\n\nAddress: http://%2s\nName: %3s"), $current_user->user_login , $newdomain . $path, stripslashes( $title ) );
-			//wp_mail( get_site_option('admin_email'), sprintf( __( '[%s] New Site Created' ), $current_site->site_name ), $content_mail, 'From: "Site Admin" <' . get_site_option( 'admin_email' ) . '>' );
-			//wpmu_welcome_notification( $blog_id, $user_id, $password, $title, array( 'public' => 1 ) );
-			//wp_redirect( add_query_arg( array('update' => 'added'), 'site-new.php' ) );
-			//exit;
 		} else {
 			$ret['error']=$blog_id->get_error_message();
 			return $ret;
