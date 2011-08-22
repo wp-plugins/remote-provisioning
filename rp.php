@@ -5,14 +5,14 @@
  Description: This plugin allows provisioning of blogs on a Wordpress multi-site installation from external packages and billing systems such as WHMCS.
 
  Author: Zingiri
- Version: 1.0.2
+ Version: 1.0.3
  Author URI: http://www.zingiri.net/
  */
 
 //error_reporting(E_ALL & ~E_NOTICE);
 //ini_set('display_errors', '1');
 
-define("CC_RP_VERSION","1.0.2");
+define("CC_RP_VERSION","1.0.3");
 
 // Pre-2.6 compatibility for wp-content folder location
 if (!defined("WP_CONTENT_URL")) {
