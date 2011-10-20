@@ -5,14 +5,14 @@
  Description: This plugin allows provisioning of blogs on a Wordpress multi-site installation from external packages and billing systems such as WHMCS.
 
  Author: Zingiri
- Version: 1.0.3
+ Version: 1.1.0
  Author URI: http://www.zingiri.net/
  */
 
 //error_reporting(E_ALL & ~E_NOTICE);
 //ini_set('display_errors', '1');
 
-define("CC_RP_VERSION","1.0.3");
+define("CC_RP_VERSION","1.1.0");
 
 // Pre-2.6 compatibility for wp-content folder location
 if (!defined("WP_CONTENT_URL")) {
@@ -101,7 +101,7 @@ function cc_rp_add_admin() {
 function cc_rp_action($action) {
 	global $wpdb,$current_user,$current_site,$base;
 	
-	$ret=array('action' => $action);
+	$ret=array('action' => $action,'version'=>CC_RP_VERSION);
 	
 	if ($action=='create') {
 		$blog = $_POST['blog'];
@@ -135,11 +135,17 @@ function cc_rp_action($action) {
 		$userName=$_POST['blog']['username'];
 		if (!$userName) $userName=$email;
 		if ( is_subdomain_install() ) {
+			$ret['install_type']='subdomain';
 			$newdomain = $domain . '.' . preg_replace( '|^www\.|', '', $current_site->domain );
 			$path = $base;
+			$ret['domain']=$newdomain;
+			$ret['path']=$path;
 		} else {
+			$ret['install_type']='subdirectory';
 			$newdomain = $current_site->domain;
 			$path = $base . $domain . '/';
+			$ret['domain']=$newdomain;
+			$ret['path']=$path;
 		}
 
 		$user_id = email_exists($email);
@@ -154,11 +160,15 @@ function cc_rp_action($action) {
 				if ($_POST['blog']['first_name']) update_user_option( $user_id, 'first_name', $_POST['blog']['firstname'], true );
 				if ($_POST['blog']['nickname']) update_user_option( $user_id, 'nickname', $_POST['blog']['nickname'], true );
 				wp_new_user_notification( $user_id, $password );
+				
 			}
-		} else {
-			$password='[your current password]';
+//		} else {
+//			$password='[your current password]';
 		}
 
+		$userdata=get_userdata( $user_id );
+		$ret['login']=$userdata->user_login;
+		
 		remove_user_from_blog( $user_id, '1' ); //removes new user from blog_id 1
 
 		$wpdb->hide_errors();
@@ -190,19 +200,16 @@ function cc_rp_action($action) {
 
 	} elseif ($action=='suspend') {
 		$domain=$_POST['blog']['domain'];
-		echo 'suspend '.$domain;
 		$id=get_id_from_blogname($domain);
 		update_blog_status( $id, 'archived', '1' );
 
 	} elseif ($action=='unsuspend') {
 		$domain=$_POST['blog']['domain'];
-		echo 'unsuspend '.$domain;
 		$id=get_id_from_blogname($domain);
 		update_blog_status( $id, 'archived', '0' );
 
 	} elseif ($action=='terminate') {
 		$domain=$_POST['blog']['domain'];
-		echo 'terminate '.$domain;
 		$id=get_id_from_blogname($domain);
 		update_blog_status( $id, 'deleted', '1' );
 		//wpmu_delete_blog($id,true); 
@@ -227,13 +234,10 @@ function cc_rp_admin() {
 <div class="wrap">
 <h2><b>Remote provisioning</b></h2>
 <p>The Remote Provisioning plugin allows provisioning of blogs on a Wordpress multi-site
-installation from external packages and billing systems such as <a href="http://www.whmcs.com"
-	target="_blank"
->WHMCS</a>.<br />
+installation from your <a href="http://www.whmcs.com" target="_blank">WHMCS</a> billing and support system.<br />
 Basically this means you can charge for providing Wordpress blogs using your prefered billing
 system. It supports creation, (un)suspension and cancellation of Wordpress blogs.<br />
-You need to download the matching module for your external package.<br />
-We have one available for WHMCS at the moment. Just order via this <a
+You need to download the matching addon for WHMCS. Just order via this <a
 	href="http://www.clientcentral.info/cart.php?a=add&pid=22"
 >link</a>.<br />
 Set up instructions can be found <a href="http://zingiri.net/products/remote-provisioning">here</a>. 
