@@ -4,11 +4,11 @@
  Plugin URI: http://www.zingiri.net
  Description: This plugin allows provisioning of blogs on a Wordpress multi-site installation from external packages and billing systems such as WHMCS.
  Author: Zingiri
- Version: 1.1.1
+ Version: 1.2.0
  Author URI: http://www.zingiri.net/
  */
 
-define("CC_RP_VERSION","1.1.1");
+define("CC_RP_VERSION","1.2.0");
 
 // Pre-2.6 compatibility for wp-content folder location
 if (!defined("WP_CONTENT_URL")) {
@@ -191,6 +191,11 @@ function cc_rp_action($action) {
 			$ret['error']=$blog_id->get_error_message();
 			return $ret;
 		}
+		
+		//options
+		switch_to_blog($blog_id);
+		if (isset($_POST['blog']['upload_space']) && is_numeric($_POST['blog']['upload_space'])) update_option('blog_upload_space',int($_POST['blog']['upload_space']));
+		
 		mkdir(WP_CONTENT_DIR.'/blogs.dir/'.$blog_id);
 		mkdir(WP_CONTENT_DIR.'/blogs.dir/'.$blog_id.'/files');
 
