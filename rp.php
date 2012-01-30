@@ -4,11 +4,11 @@
  Plugin URI: http://www.zingiri.net
  Description: This plugin allows provisioning of blogs on a Wordpress multi-site installation from external packages and billing systems such as WHMCS.
  Author: Zingiri
- Version: 1.2.0
+ Version: 1.2.1
  Author URI: http://www.zingiri.net/
  */
 
-define("CC_RP_VERSION","1.2.0");
+define("CC_RP_VERSION","1.2.1");
 
 // Pre-2.6 compatibility for wp-content folder location
 if (!defined("WP_CONTENT_URL")) {
@@ -96,9 +96,9 @@ function cc_rp_add_admin() {
 
 function cc_rp_action($action) {
 	global $wpdb,$current_user,$current_site,$base;
-	
+
 	$ret=array('action' => $action,'version'=>CC_RP_VERSION);
-	
+
 	if ($action=='create') {
 		$blog = $_POST['blog'];
 		$domain = '';
@@ -156,32 +156,31 @@ function cc_rp_action($action) {
 				if ($_POST['blog']['first_name']) update_user_option( $user_id, 'first_name', $_POST['blog']['firstname'], true );
 				if ($_POST['blog']['nickname']) update_user_option( $user_id, 'nickname', $_POST['blog']['nickname'], true );
 				wp_new_user_notification( $user_id, $password );
-				
+
 			}
-//		} else {
-//			$password='[your current password]';
 		}
 
 		$userdata=get_userdata( $user_id );
 		$ret['login']=$userdata->user_login;
-		
-		remove_user_from_blog( $user_id, '1' ); //removes new user from blog_id 1
+
+		remove_user_from_blog( $user_id, $current_site->id ); //removes new user from main blog
 
 		$wpdb->hide_errors();
-		$blog_id = wpmu_create_blog( $newdomain, $path, $title, $user_id , array( 'public' => 1 ), $current_site->id );
-
+		//$blog_id = wpmu_create_blog( $newdomain, $path, $title, $user_id , array( 'public' => 1 ), $current_site->id );
+		$blog_id = wpmu_create_blog( $newdomain, $path, $title, $user_id , array( 'public' => 1 ) );
 		if ($blog['defaultrole']) {
 			$roleName=$blog['defaultrole'];
 			$roleSlug=str_replace(' ','_',$roleName);
 			$roleSlug=strtolower($roleSlug);
 			$roleSlug=preg_replace("/[^a-zA-Z0-9\s]/", "", $roleSlug);
-			$roles=new WP_Roles();
-			$roles->add_role($roleSlug,$roleName,array($roleSlug));
-
+			if (!get_role($roleSlug)) {
+				$roles=new WP_Roles();
+				$roles->add_role($roleSlug,$roleName,array($roleSlug));
+			}
 			remove_user_from_blog($user_id, $blog_id);
-			add_user_to_blog($blog_id, $user_id, 'subscriber');
+			add_user_to_blog($blog_id, $user_id, $roleSlug);
 			$user=new WP_User($user_id);
-			$user->add_role($roleSlug);
+			//$user->add_role($roleSlug);
 		}
 
 		$wpdb->show_errors();
@@ -191,11 +190,11 @@ function cc_rp_action($action) {
 			$ret['error']=$blog_id->get_error_message();
 			return $ret;
 		}
-		
+
 		//options
 		switch_to_blog($blog_id);
 		if (isset($_POST['blog']['upload_space']) && is_numeric($_POST['blog']['upload_space'])) update_option('blog_upload_space',int($_POST['blog']['upload_space']));
-		
+
 		mkdir(WP_CONTENT_DIR.'/blogs.dir/'.$blog_id);
 		mkdir(WP_CONTENT_DIR.'/blogs.dir/'.$blog_id.'/files');
 
@@ -213,7 +212,7 @@ function cc_rp_action($action) {
 		$domain=$_POST['blog']['domain'];
 		$id=get_id_from_blogname($domain);
 		update_blog_status( $id, 'deleted', '1' );
-		//wpmu_delete_blog($id,true); 
+		//wpmu_delete_blog($id,true);
 	}
 	$ret['success']=1;
 	return $ret;
@@ -234,20 +233,22 @@ function cc_rp_admin() {
 	?>
 <div class="wrap">
 <h2><b>Remote provisioning</b></h2>
-<p>The Remote Provisioning plugin allows provisioning of blogs on a Wordpress multi-site
-installation from your billing and support system.<br />
-Basically this means you can charge for providing Wordpress blogs using your prefered billing
-system. It supports creation, (un)suspension and cancellation of Wordpress blogs.<br /><br />
-A commercial addon is available is available for <a href="http://www.whmcs.com" target="_blank">WHMCS</a> . Just order via this <a
-	href="http://www.clientcentral.info/cart.php?a=add&pid=22"
->link</a>.<br />
-Set up instructions can be found <a href="http://zingiri.net/products/remote-provisioning">here</a>. 
-<br /><br />
+<p>The Remote Provisioning plugin allows provisioning of blogs on a
+Wordpress multi-site installation from your billing and support system.<br />
+Basically this means you can charge for providing Wordpress blogs using
+your prefered billing system. It supports creation, (un)suspension and
+cancellation of Wordpress blogs.<br />
+<br />
+A commercial addon is available is available for <a
+	href="http://www.whmcs.com" target="_blank">WHMCS</a> . Just order via
+this <a href="http://www.clientcentral.info/cart.php?a=add&pid=22">link</a>.<br />
+Set up instructions can be found <a
+	href="http://zingiri.net/products/remote-provisioning">here</a>. <br />
+<br />
 That's it, no other settings.
 <hr />
-<a href="http://www.zingiri.net" target="_blank" alt="Zingiri" title="Zingiri"><image
-	src="http://zingiri.net/logo.png"
-/></a></p>
+<a href="http://www.zingiri.net" target="_blank" alt="Zingiri"
+	title="Zingiri"><image src="http://zingiri.net/logo.png" /></a></p>
 
 	<?php
 	$cc_ew=cc_rp_check();
