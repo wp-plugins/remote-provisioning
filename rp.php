@@ -1,14 +1,14 @@
 <?php
 /*
  Plugin Name: WHMCS Multi-Site Provisioning
- Plugin URI: http://www.zingiri.net
+ Plugin URI: http://www.zingiri.com
  Description: This plugin allows provisioning of blogs on a Wordpress multi-site installation from external packages and billing systems such as WHMCS.
  Author: Zingiri
- Version: 1.2.1
- Author URI: http://www.zingiri.net/
+ Version: 1.3.0
+ Author URI: http://www.zingiri.com/
  */
 
-define("CC_RP_VERSION","1.2.1");
+define("CC_RP_VERSION","1.3.0");
 
 // Pre-2.6 compatibility for wp-content folder location
 if (!defined("WP_CONTENT_URL")) {
@@ -193,7 +193,7 @@ function cc_rp_action($action) {
 
 		//options
 		switch_to_blog($blog_id);
-		if (isset($_POST['blog']['upload_space']) && is_numeric($_POST['blog']['upload_space'])) update_option('blog_upload_space',int($_POST['blog']['upload_space']));
+		if (isset($_POST['blog']['upload_space']) && is_numeric($_POST['blog']['upload_space'])) update_option('blog_upload_space',intval($_POST['blog']['upload_space']));
 
 		mkdir(WP_CONTENT_DIR.'/blogs.dir/'.$blog_id);
 		mkdir(WP_CONTENT_DIR.'/blogs.dir/'.$blog_id.'/files');
@@ -243,12 +243,12 @@ A commercial addon is available is available for <a
 	href="http://www.whmcs.com" target="_blank">WHMCS</a> . Just order via
 this <a href="http://www.clientcentral.info/cart.php?a=add&pid=22">link</a>.<br />
 Set up instructions can be found <a
-	href="http://zingiri.net/products/remote-provisioning">here</a>. <br />
+	href="http://zingiri.com/plugins-and-addons/remote-provisioning">here</a>. <br />
 <br />
 That's it, no other settings.
 <hr />
-<a href="http://www.zingiri.net" target="_blank" alt="Zingiri"
-	title="Zingiri"><image src="http://zingiri.net/logo.png" /></a></p>
+<a href="http://www.zingiri.com" target="_blank" alt="Zingiri"
+	title="Zingiri"><image src="http://zingiri.com/logo.png" /></a></p>
 
 	<?php
 	$cc_ew=cc_rp_check();

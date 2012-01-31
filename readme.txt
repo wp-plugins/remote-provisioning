@@ -1,10 +1,10 @@
 === WHMCS Multi-Site Provisioning ===
 Contributors: Zingiri
-Donate link: http://www.zingiri.net/
+Donate link: http://www.zingiri.com/donations
 Tags: WHMCS, hosting, support, billing, integration, provisioning
 Requires at least: 2.1.7
 Tested up to: 3.2.1
-Stable tag: 1.2.1
+Stable tag: 1.3.0
 
 This plugin allows provisioning of blogs on a Wordpress multi-site installation from external packages and billing systems such as WHMCS.
 
@@ -19,17 +19,19 @@ A commercial [WHMCS addon](http://www.clientcentral.info/cart.php?a=add&pid=22 "
 1. Upload the `remote-provisioning` folder to the `/wp-content/plugins/` directory
 2. Activate the plugin on the main blog of your multi-site Wordpress installation through the 'Plugins' menu in WordPress.
 
-Please visit our [Zingiri](http://www.zingiri.net/products/remote-provisioning/ "setup instructions") for more information and support and instructions on how to install available 3rd party addons.
+Please visit our [Zingiri](http://www.zingiri.com/plugins-and-addons/remote-provisioning/ "setup instructions") for more information and support and instructions on how to install available 3rd party addons.
 
 == Frequently Asked Questions ==
 
-Please visit the [Zingiri](http://forums.zingiri.net/forumdisplay.php?fid=56 "Zingiri Support Forum") for more information and support.
+Please visit the [Zingiri](http://forums.zingiri.com/forumdisplay.php?fid=80 "Zingiri Support Forum") for more information and support.
 
 == Upgrade Notice ==
 
 Simply upgrade from the plugins page.
 
 = WHMCS addoncompatibility =
+* Plugin v1.3.x compatibile with WHMCS addon v1.3.x
+* Plugin v1.2.x compatibile with WHMCS addon v1.2.x
 * Plugin v1.1.x compatibile with WHMCS addon v1.1.x
 * Plugin v1.0.x compatibile with WHMCS addon v1.0.x
 * Plugin v0.9.x compatibile with WHMCS addon v0.9.x
@@ -39,6 +41,9 @@ Simply upgrade from the plugins page.
 * Add privacy option to API (to avoid search engines crawling the site before being built)
 
 == Changelog ==
+
+= 1.3.0 =
+* Fixed issue with setting blog size
 
 = 1.2.1 =
 * Fixed issue where new blog user is left linked to main blog if that blog id is different from one
