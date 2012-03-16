@@ -4,11 +4,11 @@
  Plugin URI: http://www.zingiri.com
  Description: This plugin allows provisioning of blogs on a Wordpress multi-site installation from external packages and billing systems such as WHMCS.
  Author: Zingiri
- Version: 1.3.0
+ Version: 1.3.1
  Author URI: http://www.zingiri.com/
  */
 
-define("CC_RP_VERSION","1.3.0");
+define("CC_RP_VERSION","1.3.1");
 
 // Pre-2.6 compatibility for wp-content folder location
 if (!defined("WP_CONTENT_URL")) {
@@ -99,6 +99,10 @@ function cc_rp_action($action) {
 
 	$ret=array('action' => $action,'version'=>CC_RP_VERSION);
 
+	//ini_set('display_error',1);
+	ini_set('error_reporting',E_ALL); //^ E_NOTICE
+	//set_error_handler('cc_rp_user_error_handler',E_ALL);
+
 	if ($action=='create') {
 		$blog = $_POST['blog'];
 		$domain = '';
@@ -152,10 +156,10 @@ function cc_rp_action($action) {
 				$ret['error']=__( 'There was an error creating the user.' );
 				return $ret;
 			} else {
-				if ($_POST['blog']['last_name']) update_user_option( $user_id, 'last_name', $_POST['blog']['lastname'], true );
-				if ($_POST['blog']['first_name']) update_user_option( $user_id, 'first_name', $_POST['blog']['firstname'], true );
+				if ($_POST['blog']['last_name']) update_user_option( $user_id, 'last_name', $_POST['blog']['last_name'], true );
+				if ($_POST['blog']['first_name']) update_user_option( $user_id, 'first_name', $_POST['blog']['first_name'], true );
 				if ($_POST['blog']['nickname']) update_user_option( $user_id, 'nickname', $_POST['blog']['nickname'], true );
-				wp_new_user_notification( $user_id, $password );
+				if (!isset($_POST['blog']['notify']) || (isset($_POST['blog']['notify']) && $_POST['blog']['notify'])) wp_new_user_notification( $user_id, $password );
 
 			}
 		}
@@ -163,24 +167,35 @@ function cc_rp_action($action) {
 		$userdata=get_userdata( $user_id );
 		$ret['login']=$userdata->user_login;
 
-		remove_user_from_blog( $user_id, $current_site->id ); //removes new user from main blog
+		$x=remove_user_from_blog( $user_id, $current_site->id ); //removes new user from main blog
 
-		$wpdb->hide_errors();
-		//$blog_id = wpmu_create_blog( $newdomain, $path, $title, $user_id , array( 'public' => 1 ), $current_site->id );
 		$blog_id = wpmu_create_blog( $newdomain, $path, $title, $user_id , array( 'public' => 1 ) );
 		if ($blog['defaultrole']) {
 			$roleName=$blog['defaultrole'];
 			$roleSlug=str_replace(' ','_',$roleName);
 			$roleSlug=strtolower($roleSlug);
 			$roleSlug=preg_replace("/[^a-zA-Z0-9\s]/", "", $roleSlug);
+			$caps=array('read' => 'read');
+			if (isset($blog['capabilities'])) {
+				$cs=explode(",",$blog['capabilities']);
+				if (is_array($cs)) {
+					foreach ($cs as $c) $caps[$c]=$c;
+				}
+			}
+			switch_to_blog( $blog_id );
+				
 			if (!get_role($roleSlug)) {
 				$roles=new WP_Roles();
-				$roles->add_role($roleSlug,$roleName,array($roleSlug));
+				$x=$roles->add_role($roleSlug,$roleName,$caps);
 			}
-			remove_user_from_blog($user_id, $blog_id);
-			add_user_to_blog($blog_id, $user_id, $roleSlug);
+
+			$x=remove_user_from_blog($user_id, $blog_id);
+
+			$x=add_user_to_blog($blog_id, $user_id, $roleSlug);
+
 			$user=new WP_User($user_id);
-			//$user->add_role($roleSlug);
+
+			restore_current_blog();
 		}
 
 		$wpdb->show_errors();
@@ -243,7 +258,8 @@ A commercial addon is available is available for <a
 	href="http://www.whmcs.com" target="_blank">WHMCS</a> . Just order via
 this <a href="http://www.clientcentral.info/cart.php?a=add&pid=22">link</a>.<br />
 Set up instructions can be found <a
-	href="http://zingiri.com/plugins-and-addons/remote-provisioning">here</a>. <br />
+	href="http://zingiri.com/plugins-and-addons/remote-provisioning">here</a>.
+<br />
 <br />
 That's it, no other settings.
 <hr />
