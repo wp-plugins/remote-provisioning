@@ -4,7 +4,7 @@ Donate link: http://www.zingiri.com/donations
 Tags: WHMCS, hosting, support, billing, integration, provisioning
 Requires at least: 2.1.7
 Tested up to: 3.2.1
-Stable tag: 1.3.3
+Stable tag: 1.3.4
 
 This plugin allows provisioning of blogs on a Wordpress multi-site installation from external packages and billing systems such as WHMCS.
 
@@ -12,7 +12,7 @@ This plugin allows provisioning of blogs on a Wordpress multi-site installation 
 
 This plugin allows provisioning of blogs on a Wordpress multi-site installation from external packages and billing systems. It adds an API to Wordpress that allows the external system to call Wordpress to create, suspend, unsuspend and terminate blogs on a Wordpress multi-site installation.
 
-A commercial [WHMCS addon](http://www.clientcentral.info/cart.php?a=add&pid=22 "WHMCS addon") is currently available for a recurring fee. This allows you to set up a product in WHMCS which will automatically provision Wordpress blogs for your customers. It works just like a WHMCS server addon.
+A commercial [WHMCS addon](http://www.zingiri.com/portal/?ccce=cart&gid=23 "WHMCS addon") is currently available for a recurring fee. This allows you to set up a product in WHMCS which will automatically provision Wordpress blogs for your customers. It works just like a WHMCS server addon.
 
 == Installation ==
 
@@ -41,6 +41,9 @@ Simply upgrade from the plugins page.
 * Add privacy option to API (to avoid search engines crawling the site before being built)
 
 == Changelog ==
+
+= 1.3.4 =
+* Replaced link in readme.txt that auto adds to shopping cart
 
 = 1.3.3 =
 * Replaced remote logo by local file
