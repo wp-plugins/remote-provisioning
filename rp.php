@@ -4,11 +4,11 @@
  Plugin URI: http://www.zingiri.com
  Description: This plugin allows provisioning of blogs on a Wordpress multi-site installation from external packages and billing systems such as WHMCS.
  Author: Zingiri
- Version: 1.3.2
+ Version: 1.3.3
  Author URI: http://www.zingiri.com/
  */
 
-define("CC_RP_VERSION","1.3.2");
+define("CC_RP_VERSION","1.3.3");
 
 // Pre-2.6 compatibility for wp-content folder location
 if (!defined("WP_CONTENT_URL")) {
@@ -264,7 +264,7 @@ Set up instructions can be found <a
 That's it, no other settings.
 <hr />
 <a href="http://www.zingiri.com" target="_blank" alt="Zingiri"
-	title="Zingiri"><image src="http://zingiri.com/logo.png" /></a></p>
+	title="Zingiri"><image src="<?php echo plugins_url()?>/remote-provisioning/logo.png" /></a></p>
 
 	<?php
 	$cc_ew=cc_rp_check();
