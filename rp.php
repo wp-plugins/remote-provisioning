@@ -4,11 +4,11 @@
  Plugin URI: http://www.zingiri.com
  Description: This plugin allows provisioning of blogs on a Wordpress multi-site installation from external packages and billing systems such as WHMCS.
  Author: Zingiri
- Version: 1.3.6
+ Version: 1.3.7
  Author URI: http://www.zingiri.com/
  */
 
-define("CC_RP_VERSION","1.3.6");
+define("CC_RP_VERSION","1.3.7");
 
 // Pre-2.6 compatibility for wp-content folder location
 if (!defined("WP_CONTENT_URL")) {
@@ -106,13 +106,14 @@ function cc_rp_action($action) {
 	if ($action=='create') {
 		$blog = $_POST['blog'];
 		$domain = '';
-		if ( ! preg_match( '/(--)/', $blog['domain'] ) && preg_match( '|^([a-zA-Z0-9-])+$|', $blog['domain'] ) ) $domain = strtolower( $blog['domain'] );
-
+		if ( ! preg_match( '/(--)/', $blog['domain'] ) && preg_match( '|^([a-zA-Z0-9\-\.])+$|', $blog['domain'] ) ) $domain = strtolower( $blog['domain'] );
+		
 		// If not a subdomain install, make sure the domain isn't a reserved word
 		if ( ! is_subdomain_install() ) {
 			$subdirectory_reserved_names = apply_filters( 'subdirectory_reserved_names', array( 'page', 'comments', 'blog', 'files', 'feed' ) );
 			if ( in_array( $domain, $subdirectory_reserved_names ) ) {
 				$ret['error']=sprintf(__('The following words are reserved for use by WordPress functions and cannot be used as blog names: <code>%s</code>'), implode( '</code>, <code>', $subdirectory_reserved_names ));
+				$ret['error']=sprintf('The following words are reserved for use by WordPress functions and cannot be used as blog names: <code>%s</code>', implode( '</code>, <code>', $subdirectory_reserved_names ));
 				return $ret;
 			}
 		}
@@ -121,14 +122,17 @@ function cc_rp_action($action) {
 
 		if ( empty( $domain ) ) {
 			$ret['error']=__('Missing or invalid site address.');
+			$ret['error_en']='Missing or invalid site address.';
 			return $ret;
 		}
 		if ( empty( $email ) ) {
 			$ret['error']=__('Missing email address.');
+			$ret['error_en']='Missing email address.';
 			return $ret;
 		}
 		if ( !is_email( $email ) ) {
 			$ret['error']=__('Invalid email address.');
+			$ret['error']='Invalid email address.';
 			return $ret;
 		}
 
@@ -154,6 +158,7 @@ function cc_rp_action($action) {
 			$user_id = wpmu_create_user( $userName, $blog['password'], $email );
 			if ( false == $user_id ) {
 				$ret['error']=__( 'There was an error creating the user.' );
+				$ret['error_en']='There was an error creating the user.';
 				return $ret;
 			} else {
 				if ($_POST['blog']['last_name']) update_user_option( $user_id, 'last_name', $_POST['blog']['last_name'], true );
@@ -167,7 +172,7 @@ function cc_rp_action($action) {
 		$userdata=get_userdata( $user_id );
 		$ret['login']=$userdata->user_login;
 
-		$x=remove_user_from_blog( $user_id, $current_site->id ); //removes new user from main blog
+		remove_user_from_blog( $user_id, $current_site->id ); //removes new user from main blog
 
 		$blog_id = wpmu_create_blog( $newdomain, $path, $title, $user_id , array( 'public' => 1 ) );
 		if ($blog['defaultrole']) {
@@ -186,12 +191,12 @@ function cc_rp_action($action) {
 				
 			if (!get_role($roleSlug)) {
 				$roles=new WP_Roles();
-				$x=$roles->add_role($roleSlug,$roleName,$caps);
+				$roles->add_role($roleSlug,$roleName,$caps);
 			}
 
-			$x=remove_user_from_blog($user_id, $blog_id);
+			remove_user_from_blog($user_id, $blog_id);
 
-			$x=add_user_to_blog($blog_id, $user_id, $roleSlug);
+			add_user_to_blog($blog_id, $user_id, $roleSlug);
 
 			$user=new WP_User($user_id);
 
@@ -239,7 +244,7 @@ function cc_rp_admin() {
 
 	$action=$_POST['action'];
 	if ($action) {
-		ob_end_clean();
+		while (count(ob_get_status(true)) > 0) ob_end_clean();
 		$ret=cc_rp_action($action);
 		echo json_encode($ret);
 		exit;
