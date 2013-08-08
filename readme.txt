@@ -3,8 +3,8 @@ Contributors: Zingiri
 Donate link: http://www.zingiri.com/donations
 Tags: WHMCS, hosting, support, billing, integration, provisioning
 Requires at least: 2.1.7
-Tested up to: 3.5.2
-Stable tag: 1.3.7
+Tested up to: 3.6
+Stable tag: 1.4.0
 
 This plugin allows provisioning of blogs on a Wordpress multi-site installation from external packages and billing systems such as WHMCS.
 
@@ -30,6 +30,7 @@ Please visit the [Zingiri](http://forums.zingiri.com/forumdisplay.php?fid=80 "Zi
 Simply upgrade from the plugins page.
 
 = WHMCS addoncompatibility =
+* Plugin v1.4.x compatibile with WHMCS addon v1.4.x
 * Plugin v1.3.x compatibile with WHMCS addon v1.3.x
 * Plugin v1.2.x compatibile with WHMCS addon v1.2.x
 * Plugin v1.1.x compatibile with WHMCS addon v1.1.x
@@ -41,6 +42,10 @@ Simply upgrade from the plugins page.
 * Add privacy option to API (to avoid search engines crawling the site before being built)
 
 == Changelog ==
+
+= 1.4.0 =
+* Verified compatibility with Wordpress v3.6
+* Improved error messages returned in case of failure
 
 = 1.3.7 =
 * Fixed issue with html buffer not being cleared before Json response is returned

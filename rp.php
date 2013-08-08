@@ -4,11 +4,9 @@
  Plugin URI: http://www.zingiri.com
  Description: This plugin allows provisioning of blogs on a Wordpress multi-site installation from external packages and billing systems such as WHMCS.
  Author: Zingiri
- Version: 1.3.7
+ Version: 1.4.0
  Author URI: http://www.zingiri.com/
  */
-
-define("CC_RP_VERSION","1.3.7");
 
 // Pre-2.6 compatibility for wp-content folder location
 if (!defined("WP_CONTENT_URL")) {
@@ -97,7 +95,8 @@ function cc_rp_add_admin() {
 function cc_rp_action($action) {
 	global $wpdb,$current_user,$current_site,$base;
 
-	$ret=array('action' => $action,'version'=>CC_RP_VERSION);
+	$plugin=get_plugin_data(__FILE__,false,false);
+	$ret=array('action' => $action,'version'=>$plugin['Version']);
 
 	//ini_set('display_error',1);
 	ini_set('error_reporting',E_ALL); //^ E_NOTICE
@@ -107,7 +106,11 @@ function cc_rp_action($action) {
 		$blog = $_POST['blog'];
 		$domain = '';
 		if ( ! preg_match( '/(--)/', $blog['domain'] ) && preg_match( '|^([a-zA-Z0-9\-\.])+$|', $blog['domain'] ) ) $domain = strtolower( $blog['domain'] );
-		
+		else {
+			$ret['error']=__('Invalid site address.');
+			$ret['error_en']='Invalid site address.';
+			return $ret;
+		}
 		// If not a subdomain install, make sure the domain isn't a reserved word
 		if ( ! is_subdomain_install() ) {
 			$subdirectory_reserved_names = apply_filters( 'subdirectory_reserved_names', array( 'page', 'comments', 'blog', 'files', 'feed' ) );
@@ -121,8 +124,8 @@ function cc_rp_action($action) {
 		$title = $blog['title'];
 
 		if ( empty( $domain ) ) {
-			$ret['error']=__('Missing or invalid site address.');
-			$ret['error_en']='Missing or invalid site address.';
+			$ret['error']=__('Missing site address.');
+			$ret['error_en']='Missing site address.';
 			return $ret;
 		}
 		if ( empty( $email ) ) {
@@ -175,6 +178,7 @@ function cc_rp_action($action) {
 		remove_user_from_blog( $user_id, $current_site->id ); //removes new user from main blog
 
 		$blog_id = wpmu_create_blog( $newdomain, $path, $title, $user_id , array( 'public' => 1 ) );
+		$ret['blog_id']=$blog_id;
 		if ($blog['defaultrole']) {
 			$roleName=$blog['defaultrole'];
 			$roleSlug=str_replace(' ','_',$roleName);
@@ -188,7 +192,7 @@ function cc_rp_action($action) {
 				}
 			}
 			switch_to_blog( $blog_id );
-				
+
 			if (!get_role($roleSlug)) {
 				$roles=new WP_Roles();
 				$roles->add_role($roleSlug,$roleName,$caps);
@@ -215,8 +219,15 @@ function cc_rp_action($action) {
 		switch_to_blog($blog_id);
 		if (isset($_POST['blog']['upload_space']) && is_numeric($_POST['blog']['upload_space'])) update_option('blog_upload_space',intval($_POST['blog']['upload_space']));
 
-		mkdir(WP_CONTENT_DIR.'/blogs.dir/'.$blog_id);
-		mkdir(WP_CONTENT_DIR.'/blogs.dir/'.$blog_id.'/files');
+		try {
+			$ret['blog_dir']=WP_CONTENT_DIR.'/blogs.dir/'.$blog_id;
+			mkdir(WP_CONTENT_DIR.'/blogs.dir/'.$blog_id);
+			mkdir(WP_CONTENT_DIR.'/blogs.dir/'.$blog_id.'/files');
+		} catch (Exception $e) {
+			$ret['error']=__('Could not create blog directories, verify installation.');
+			$ret['error']='Could not create blog directories, verify installation.';
+			return $ret;
+		}
 
 	} elseif ($action=='suspend') {
 		$domain=$_POST['blog']['domain'];
@@ -252,24 +263,28 @@ function cc_rp_admin() {
 
 	?>
 <div class="wrap">
-<h2><b>Remote provisioning</b></h2>
-<p>The Remote Provisioning plugin allows provisioning of blogs on a
-Wordpress multi-site installation from your billing and support system.<br />
-Basically this means you can charge for providing Wordpress blogs using
-your prefered billing system. It supports creation, (un)suspension and
-cancellation of Wordpress blogs.<br />
-<br />
-A commercial addon is available is available for <a
-	href="http://www.whmcs.com" target="_blank">WHMCS</a> . Just order via
-this <a href="http://www.clientcentral.info/cart.php?a=add&pid=22">link</a>.<br />
-Set up instructions can be found <a
-	href="http://zingiri.com/plugins-and-addons/remote-provisioning">here</a>.
-<br />
-<br />
-That's it, no other settings.
-<hr />
-<a href="http://www.zingiri.com" target="_blank" alt="Zingiri"
-	title="Zingiri"><image src="<?php echo plugins_url()?>/remote-provisioning/logo.png" /></a></p>
+	<h2>
+		<b>Remote provisioning</b>
+	</h2>
+	<p>
+		The Remote Provisioning plugin allows provisioning of blogs on a
+		Wordpress multi-site installation from your billing and support
+		system.<br /> Basically this means you can charge for providing
+		Wordpress blogs using your prefered billing system. It supports
+		creation, (un)suspension and cancellation of Wordpress blogs.<br /> <br />
+		A commercial addon is available is available for <a
+			href="http://www.whmcs.com" target="_blank">WHMCS</a> . Just order
+		via this <a href="http://www.clientcentral.info/cart.php?a=add&pid=22">link</a>.<br />
+		Set up instructions can be found <a
+			href="http://zingiri.com/plugins-and-addons/remote-provisioning">here</a>.
+		<br /> <br /> That's it, no other settings.
+	
+	
+	<hr />
+	<a href="http://www.zingiri.com" target="_blank" alt="Zingiri"
+		title="Zingiri"><image
+			src="<?php echo plugins_url()?>/remote-provisioning/logo.png" /> </a>
+	</p>
 
 	<?php
 	$cc_ew=cc_rp_check();
