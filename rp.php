@@ -4,7 +4,7 @@
  Plugin URI: http://www.zingiri.com
  Description: This plugin allows provisioning of blogs on a Wordpress multi-site installation from external packages and billing systems such as WHMCS.
  Author: Zingiri
- Version: 1.4.0
+ Version: 1.4.1
  Author URI: http://www.zingiri.com/
  */
 
@@ -95,11 +95,13 @@ function cc_rp_add_admin() {
 function cc_rp_action($action) {
 	global $wpdb,$current_user,$current_site,$base;
 
+	$wpdb->hide_errors();
+
 	$plugin=get_plugin_data(__FILE__,false,false);
 	$ret=array('action' => $action,'version'=>$plugin['Version']);
 
 	//ini_set('display_error',1);
-	ini_set('error_reporting',E_ALL); //^ E_NOTICE
+	//ini_set('error_reporting',E_ALL); //^ E_NOTICE
 	//set_error_handler('cc_rp_user_error_handler',E_ALL);
 
 	if ($action=='create') {
@@ -109,6 +111,7 @@ function cc_rp_action($action) {
 		else {
 			$ret['error']=__('Invalid site address.');
 			$ret['error_en']='Invalid site address.';
+			$ret['error_num']=100;
 			return $ret;
 		}
 		// If not a subdomain install, make sure the domain isn't a reserved word
@@ -116,7 +119,8 @@ function cc_rp_action($action) {
 			$subdirectory_reserved_names = apply_filters( 'subdirectory_reserved_names', array( 'page', 'comments', 'blog', 'files', 'feed' ) );
 			if ( in_array( $domain, $subdirectory_reserved_names ) ) {
 				$ret['error']=sprintf(__('The following words are reserved for use by WordPress functions and cannot be used as blog names: <code>%s</code>'), implode( '</code>, <code>', $subdirectory_reserved_names ));
-				$ret['error']=sprintf('The following words are reserved for use by WordPress functions and cannot be used as blog names: <code>%s</code>', implode( '</code>, <code>', $subdirectory_reserved_names ));
+				$ret['error_en']=sprintf('The following words are reserved for use by WordPress functions and cannot be used as blog names: <code>%s</code>', implode( '</code>, <code>', $subdirectory_reserved_names ));
+				$ret['error_num']=101;
 				return $ret;
 			}
 		}
@@ -126,16 +130,19 @@ function cc_rp_action($action) {
 		if ( empty( $domain ) ) {
 			$ret['error']=__('Missing site address.');
 			$ret['error_en']='Missing site address.';
+			$ret['error_num']=102;
 			return $ret;
 		}
 		if ( empty( $email ) ) {
 			$ret['error']=__('Missing email address.');
 			$ret['error_en']='Missing email address.';
+			$ret['error_num']=103;
 			return $ret;
 		}
 		if ( !is_email( $email ) ) {
 			$ret['error']=__('Invalid email address.');
-			$ret['error']='Invalid email address.';
+			$ret['error_en']='Invalid email address.';
+			$ret['error_num']=104;
 			return $ret;
 		}
 
@@ -143,7 +150,8 @@ function cc_rp_action($action) {
 		if (!$userName) $userName=$email;
 		if ( is_subdomain_install() ) {
 			$ret['install_type']='subdomain';
-			$newdomain = $domain . '.' . preg_replace( '|^www\.|', '', $current_site->domain );
+			//$newdomain = $domain . '.' . preg_replace( '|^www\.|', '', $current_site->domain );
+			$newdomain=$domain;
 			$path = $base;
 			$ret['domain']=$newdomain;
 			$ret['path']=$path;
@@ -155,6 +163,13 @@ function cc_rp_action($action) {
 			$ret['path']=$path;
 		}
 
+		if (domain_exists($newdomain, $path)) {
+			$ret['error']=__('Domain exists already.');
+			$ret['error_en']='Domain exists already.';
+			$ret['error_num']=106;
+			return $ret;
+		}
+		
 		$user_id = email_exists($email);
 		if ( !$user_id ) { // Create a new user with a random password
 			$password=$blog['password'];
@@ -162,6 +177,7 @@ function cc_rp_action($action) {
 			if ( false == $user_id ) {
 				$ret['error']=__( 'There was an error creating the user.' );
 				$ret['error_en']='There was an error creating the user.';
+				$ret['error_num']=105;
 				return $ret;
 			} else {
 				if ($_POST['blog']['last_name']) update_user_option( $user_id, 'last_name', $_POST['blog']['last_name'], true );
@@ -178,6 +194,7 @@ function cc_rp_action($action) {
 		remove_user_from_blog( $user_id, $current_site->id ); //removes new user from main blog
 
 		$blog_id = wpmu_create_blog( $newdomain, $path, $title, $user_id , array( 'public' => 1 ) );
+
 		$ret['blog_id']=$blog_id;
 		if ($blog['defaultrole']) {
 			$roleName=$blog['defaultrole'];
@@ -207,11 +224,12 @@ function cc_rp_action($action) {
 			restore_current_blog();
 		}
 
-		$wpdb->show_errors();
 		if ( !is_wp_error( $blog_id ) ) {
 			if ( !is_super_admin( $user_id ) && !get_user_option( 'primary_blog', $user_id ) ) update_user_option( $user_id, 'primary_blog', $blog_id, true );
 		} else {
 			$ret['error']=$blog_id->get_error_message();
+			$ret['error_en']='Error creating domain (2)';
+			$ret['error_num']=107;
 			return $ret;
 		}
 
@@ -221,11 +239,11 @@ function cc_rp_action($action) {
 
 		try {
 			$ret['blog_dir']=WP_CONTENT_DIR.'/blogs.dir/'.$blog_id;
-			mkdir(WP_CONTENT_DIR.'/blogs.dir/'.$blog_id);
-			mkdir(WP_CONTENT_DIR.'/blogs.dir/'.$blog_id.'/files');
+			if (!file_exists(WP_CONTENT_DIR.'/blogs.dir/'.$blog_id)) @mkdir(WP_CONTENT_DIR.'/blogs.dir/'.$blog_id);
+			if (!file_exists(WP_CONTENT_DIR.'/blogs.dir/'.$blog_id.'/files')) @mkdir(WP_CONTENT_DIR.'/blogs.dir/'.$blog_id.'/files');
 		} catch (Exception $e) {
 			$ret['error']=__('Could not create blog directories, verify installation.');
-			$ret['error']='Could not create blog directories, verify installation.';
+			$ret['error_en']='Could not create blog directories, verify installation.';
 			return $ret;
 		}
 
