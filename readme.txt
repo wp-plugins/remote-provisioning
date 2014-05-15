@@ -1,5 +1,5 @@
 === WHMCS Multi-Site Provisioning ===
-Contributors: Zingiri
+Contributors: globalprogramming, zingiri
 Donate link: http://www.zingiri.com/donations
 Tags: WHMCS, hosting, support, billing, integration, provisioning
 Requires at least: 2.1.7
