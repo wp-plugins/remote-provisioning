@@ -1,11 +1,11 @@
 <?php
 /*
  Plugin Name: WHMCS Multi-Site Provisioning
- Plugin URI: http://www.zingiri.com
+ Plugin URI: http://i-plugins.com
  Description: This plugin allows provisioning of blogs on a Wordpress multi-site installation from external packages and billing systems such as WHMCS.
- Author: Zingiri
- Version: 1.4.1
- Author URI: http://www.zingiri.com/
+ Author: globalprogramming, zingiri
+ Version: 1.4.2
+ Author URI: http://i-plugins.com/
  */
 
 // Pre-2.6 compatibility for wp-content folder location
@@ -292,15 +292,13 @@ function cc_rp_admin() {
 		creation, (un)suspension and cancellation of Wordpress blogs.<br /> <br />
 		A commercial addon is available is available for <a
 			href="http://www.whmcs.com" target="_blank">WHMCS</a> . Just order
-		via this <a href="http://www.clientcentral.info/cart.php?a=add&pid=22">link</a>.<br />
-		Set up instructions can be found <a
-			href="http://zingiri.com/plugins-and-addons/remote-provisioning">here</a>.
+		via this <a href="http://i-plugins.com/wordpress-multi-site-provisioning/">link</a>.
 		<br /> <br /> That's it, no other settings.
 	
 	
 	<hr />
-	<a href="http://www.zingiri.com" target="_blank" alt="Zingiri"
-		title="Zingiri"><image
+	<a href="http://i-plugins.com" target="_blank" alt="i-Plugins"
+		title="i-Plugins"><image
 			src="<?php echo plugins_url()?>/remote-provisioning/logo.png" /> </a>
 	</p>
 

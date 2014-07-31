@@ -3,8 +3,8 @@ Contributors: globalprogramming, zingiri
 Donate link: http://www.zingiri.com/donations
 Tags: WHMCS, hosting, support, billing, integration, provisioning
 Requires at least: 2.1.7
-Tested up to: 3.6
-Stable tag: 1.4.1
+Tested up to: 3.9.1
+Stable tag: 1.4.2
 
 This plugin allows provisioning of blogs on a Wordpress multi-site installation from external packages and billing systems such as WHMCS.
 
@@ -12,18 +12,18 @@ This plugin allows provisioning of blogs on a Wordpress multi-site installation 
 
 This plugin allows provisioning of blogs on a Wordpress multi-site installation from external packages and billing systems. It adds an API to Wordpress that allows the external system to call Wordpress to create, suspend, unsuspend and terminate blogs on a Wordpress multi-site installation.
 
-A commercial [WHMCS addon](http://www.zingiri.com/portal/?ccce=cart&gid=23 "WHMCS addon") is currently available for a recurring fee. This allows you to set up a product in WHMCS which will automatically provision Wordpress blogs for your customers. It works just like a WHMCS server addon.
+A commercial [WHMCS addon](https://i-plugins.com/whmcs-bridge/cart/?a=add&pid=22 "WHMCS addon") is currently available for a recurring fee. This allows you to set up a product in WHMCS which will automatically provision Wordpress blogs for your customers. It works just like a WHMCS server addon.
 
 == Installation ==
 
 1. Upload the `remote-provisioning` folder to the `/wp-content/plugins/` directory
 2. Activate the plugin on the main blog of your multi-site Wordpress installation through the 'Plugins' menu in WordPress.
 
-Please visit our [Zingiri](http://www.zingiri.com/plugins-and-addons/remote-provisioning/ "setup instructions") for more information and support and instructions on how to install available 3rd party addons.
+Please visit our [i-Plugins](http://i-plugins.com/wordpress-multi-site-provisioning/ "setup instructions") for more information and support and instructions on how to install available 3rd party addons.
 
 == Frequently Asked Questions ==
 
-Please visit the [Zingiri](http://forums.zingiri.com/forumdisplay.php?fid=80 "Zingiri Support Forum") for more information and support.
+Please submit a support ticket at [i-Plugins](http://i-plugins.com/whmcs-bridge/ “i-Plugins Client Zone“) for more information and support.
 
 == Upgrade Notice ==
 
@@ -42,6 +42,9 @@ Simply upgrade from the plugins page.
 * Add privacy option to API (to avoid search engines crawling the site before being built)
 
 == Changelog ==
+
+= 1.4.2 =
+* Changed from Zingiri to i-Plugins
 
 = 1.4.1 =
 * Improved error handling
