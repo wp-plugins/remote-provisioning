@@ -3,8 +3,8 @@ Contributors: globalprogramming, zingiri
 Donate link: http://www.zingiri.com/donations
 Tags: WHMCS, hosting, support, billing, integration, provisioning
 Requires at least: 2.1.7
-Tested up to: 3.9.2
-Stable tag: 1.4.2
+Tested up to: 4.1
+Stable tag: 1.4.3
 
 This plugin allows provisioning of blogs on a Wordpress multi-site installation from external packages and billing systems such as WHMCS.
 
@@ -42,6 +42,9 @@ Simply upgrade from the plugins page.
 * Add privacy option to API (to avoid search engines crawling the site before being built)
 
 == Changelog ==
+
+= 1.4.3 =
+* Fixed issue where blogs were created without / after domain for subdirectories (eg: blog.tldblogname instead of blog.tld/blogname)
 
 = 1.4.2 =
 * Changed from Zingiri to i-Plugins

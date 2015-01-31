@@ -3,8 +3,8 @@
  Plugin Name: WHMCS Multi-Site Provisioning
  Plugin URI: http://i-plugins.com
  Description: This plugin allows provisioning of blogs on a Wordpress multi-site installation from external packages and billing systems such as WHMCS.
- Author: globalprogramming, zingiri
- Version: 1.4.2
+ Author: globalprogramming
+ Version: 1.4.3
  Author URI: http://i-plugins.com/
  */
 
@@ -158,7 +158,12 @@ function cc_rp_action($action) {
 		} else {
 			$ret['install_type']='subdirectory';
 			$newdomain = $current_site->domain;
-			$path = $base . $domain . '/';
+
+            if (substr($base, -1) != '/')
+                $path = $base . '/' . $domain . '/';
+            else
+                $path = $base . $domain . '/';
+
 			$ret['domain']=$newdomain;
 			$ret['path']=$path;
 		}
