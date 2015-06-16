@@ -4,7 +4,7 @@
  Plugin URI: http://i-plugins.com
  Description: This plugin allows provisioning of blogs on a Wordpress multi-site installation from external packages and billing systems such as WHMCS.
  Author: globalprogramming
- Version: 1.4.4
+ Version: 1.4.5
  Author URI: http://i-plugins.com/
  */
 
@@ -150,8 +150,12 @@ function cc_rp_action($action) {
 		if (!$userName) $userName=$email;
 		if ( is_subdomain_install() ) {
 			$ret['install_type']='subdomain';
-			$newdomain = $domain . '.' . preg_replace( '|^www\.|', '', $current_site->domain );
-			//$newdomain=$domain;
+			$parent_domain = preg_replace('|^www\.|', '', $current_site->domain);
+			if (stristr($domain, $parent_domain) !== false)
+				$newdomain = $domain;
+			else 
+				$newdomain = $domain . '.' . $parent_domain;
+
 			$path = $base;
 			$ret['domain']=$newdomain;
 			$ret['path']=$path;
